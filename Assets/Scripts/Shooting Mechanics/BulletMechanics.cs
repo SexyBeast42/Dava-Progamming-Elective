@@ -6,7 +6,7 @@ using UnityEngine;
 public class BulletMechanics : MonoBehaviour
 {
     [SerializeField]
-    private float moveSpeed = 1000;
+    private float moveSpeed = 100;
 
     private Rigidbody rb;
 
