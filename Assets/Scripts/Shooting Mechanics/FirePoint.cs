@@ -9,7 +9,7 @@ public class FirePoint : MonoBehaviour
 
     public bool hasFired;
 
-    // Tell logic has reloaded
+    // Tell logic gun has reloaded
     private UnityEvent reloaded;
 
     private void Start()
@@ -28,7 +28,7 @@ public class FirePoint : MonoBehaviour
         // Instatiate a bullet prefab then gives it a velocity forward
         if (!hasFired)
         {
-            GameObject bullet = Instantiate(bulletObj, transform.position, Quaternion.identity) as GameObject;
+            GameObject bullet = Instantiate(bulletObj, transform.position, Quaternion.identity);
             bullet.GetComponent<Rigidbody>()
                 .AddForce(transform.forward.normalized * bullet.GetComponent<BulletMechanics>().GetMoveSpeed(),
                     ForceMode.Impulse);
@@ -40,8 +40,6 @@ public class FirePoint : MonoBehaviour
     {
         reloaded.Invoke();
         hasFired = false;
-        // print("reloaded2 " + hasFired);
+        // print("reloaded " + hasFired);
     }
-    
-    //Coroutine for reload cooldown (potential if too fast)
 }

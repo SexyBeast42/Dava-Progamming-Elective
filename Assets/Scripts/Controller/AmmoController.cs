@@ -7,23 +7,23 @@ public class AmmoController : MonoBehaviour
 {
     // List for guns and shots fired
     public GameObject[] guns;
+    public List<FirePoint> reloadAll;
     public List<bool> shotFired;
     
     // Reload guns
-    private UnityEvent reloadAll;
-    private bool reloading;
+    private bool isReloading;
 
-    public void Start()
+    private void Start()
     {
         GetAllGuns();
     }
 
-    public void FixedUpdate()
+    private void FixedUpdate()
     {
-        if (!reloading && AllShotsFired())
+        if (!isReloading && AllShotsFired())
         {
-            reloading = true;
-            Reload();
+            isReloading = true;
+            StartCoroutine(Reload());
         }
     }
     
@@ -38,18 +38,22 @@ public class AmmoController : MonoBehaviour
 
             if (firePoint != null)
             {
-                reloadAll = new UnityEvent();
-                reloadAll.AddListener(firePoint.Reload);
-                
+                reloadAll.Add(firePoint);
+
                 shotFired.Add(firePoint.GetHasFired());
             }
         }
     }
 
-    private void Reload()
+    IEnumerator Reload()
     {
-        reloadAll.Invoke();
-        reloading = false;
+        yield return new WaitForSeconds(1);
+        foreach (FirePoint firePoint in reloadAll)
+        {
+            firePoint.Reload();
+        }
+        
+        isReloading = false;
 
         // Debug.Log("reloadInvoked");
     }
