@@ -14,7 +14,7 @@ public class AI_Logic : MonoBehaviour
 
     // For shooting
     private FirePoint firePoint;
-    private bool canAttack;
+    public bool canAttack;
 
     // For player vision
     [SerializeField] private float viewRadius;
@@ -41,9 +41,6 @@ public class AI_Logic : MonoBehaviour
 
     void Update()
     {
-        // Ammo checker
-        // if hasBullet in firePoint true => attack
-        
         switch (state)
         {
             case State.wander:
@@ -56,9 +53,21 @@ public class AI_Logic : MonoBehaviour
                 break;
             
             case State.evade:
-                Evade();
+                if (canAttack)
+                {
+                    state = State.wander;
+                }
+                else
+                {
+                    Evade();   
+                }
                 break;
         }
+    }
+
+    public void HasReloaded()
+    {
+        canAttack = true;
     }
 
     // Wander State
@@ -92,6 +101,7 @@ public class AI_Logic : MonoBehaviour
     // Attack State
     private void Attack()
     {
+        canAttack = false;
         firePoint.Shoot();
         state = State.evade;
     }
@@ -153,10 +163,25 @@ public class AI_Logic : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, viewRadius);
     }
 
+    private bool lastManStanding;
+
+    public void IsLastManStanding()
+    {
+        print(name + " is winnar");
+        lastManStanding = true;
+    }
+
     // Kills the AI
     public void Die()
     {
         // print("hit");
-        Destroy(gameObject);
+        // Can't use destroy, as it would break ammoController
+        // Destroy(gameObject);
+        
+        // So we deactivate it instead
+        if (!lastManStanding)
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

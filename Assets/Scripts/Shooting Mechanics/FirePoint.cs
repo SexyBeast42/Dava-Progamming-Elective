@@ -1,39 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class FirePoint : MonoBehaviour
 {
     public GameObject bulletObj;
 
-    public bool hasBullet = true;
+    public bool hasFired;
 
-    // void Update()
-    // {
-    //     if (Input.GetMouseButtonDown(0))
-    //     {
-    //         Shoot();
-    //     }
-    // }
+    // Tell logic has reloaded
+    private UnityEvent reloaded;
+
+    private void Start()
+    {
+        reloaded = new UnityEvent();
+        reloaded.AddListener(GetComponentInParent<AI_Logic>().HasReloaded);
+    }
     
+    public bool GetHasFired()
+    {
+        return hasFired;
+    }
+
     public void Shoot()
     {
-        // print("Shoot");
-        
         // Instatiate a bullet prefab then gives it a velocity forward
-        if (hasBullet)
+        if (!hasFired)
         {
             GameObject bullet = Instantiate(bulletObj, transform.position, Quaternion.identity) as GameObject;
             bullet.GetComponent<Rigidbody>()
                 .AddForce(transform.forward.normalized * bullet.GetComponent<BulletMechanics>().GetMoveSpeed(),
                     ForceMode.Impulse);
-            hasBullet = false;
+            hasFired = true;
         }
     }
 
     public void Reload()
     {
-        hasBullet = true;
+        reloaded.Invoke();
+        hasFired = false;
+        // print("reloaded2 " + hasFired);
     }
     
     //Coroutine for reload cooldown (potential if too fast)

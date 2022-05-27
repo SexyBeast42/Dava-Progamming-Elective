@@ -26,6 +26,7 @@ public class BulletMechanics : MonoBehaviour
         if (col.gameObject.CompareTag("Player"))
         {
             // print("col");
+            
             col.gameObject.GetComponent<AI_Logic>().Die();
         }
     }
