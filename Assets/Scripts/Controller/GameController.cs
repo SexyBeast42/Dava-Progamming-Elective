@@ -29,11 +29,12 @@ public class GameController : MonoBehaviour
             {
                 playersInGame.Remove(playersInGame[i]);
             }
-            
-            if (playersInGame.Count <= 1)
+
+            else if (playersInGame.Count <= 1)
             {
                 playersInGame[i].GetComponent<AI_Logic>().IsLastManStanding();
             }
         }
+        
     }
 }

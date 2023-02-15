@@ -411,6 +411,7 @@ MonoBehaviour:
   walkRadius: 76
   canAttack: 0
   viewRadius: 10
+  viewAngles: 60
   targetMask:
     serializedVersion: 2
     m_Bits: 1408
@@ -430,7 +431,7 @@ NavMeshAgent:
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 60
   m_StoppingDistance: 2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -979,6 +980,7 @@ MonoBehaviour:
   walkRadius: 76
   canAttack: 0
   viewRadius: 10
+  viewAngles: 60
   targetMask:
     serializedVersion: 2
     m_Bits: 896
@@ -998,7 +1000,7 @@ NavMeshAgent:
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 60
   m_StoppingDistance: 2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -1876,7 +1878,7 @@ NavMeshAgent:
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 60
   m_StoppingDistance: 2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -1964,6 +1966,7 @@ MonoBehaviour:
   walkRadius: 76
   canAttack: 0
   viewRadius: 10
+  viewAngles: 60
   targetMask:
     serializedVersion: 2
     m_Bits: 1792
@@ -2291,6 +2294,7 @@ MonoBehaviour:
   walkRadius: 76
   canAttack: 0
   viewRadius: 10
+  viewAngles: 60
   targetMask:
     serializedVersion: 2
     m_Bits: 1664
@@ -2310,7 +2314,7 @@ NavMeshAgent:
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 60
   m_StoppingDistance: 2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -2837,7 +2841,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   guns: []
   reloadAll: []
-  shotFired: 
 --- !u!4 &2101767795
 Transform:
   m_ObjectHideFlags: 0

@@ -1,14 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class AmmoController : MonoBehaviour
 {
     // List for guns and shots fired
-    public GameObject[] guns;
+    public List<GameObject> guns;
     public List<FirePoint> reloadAll;
-    public List<bool> shotFired;
+    // public List<bool> shotFired;
     
     // Reload guns
     private bool isReloading;
@@ -25,13 +26,19 @@ public class AmmoController : MonoBehaviour
             isReloading = true;
             StartCoroutine(Reload());
         }
+        APlayerHasDied();
     }
     
     private void GetAllGuns()
     {
         // Finds all guns in the game
-        guns = GameObject.FindGameObjectsWithTag("Gun");
-        
+        GameObject[] gunsInGame = GameObject.FindGameObjectsWithTag("Gun");
+
+        foreach (GameObject gun in gunsInGame)
+        {
+            guns.Add(gun);
+        }
+
         foreach (GameObject gun in guns)
         {
             FirePoint firePoint = gun.GetComponent<FirePoint>();
@@ -40,7 +47,7 @@ public class AmmoController : MonoBehaviour
             {
                 reloadAll.Add(firePoint);
 
-                shotFired.Add(firePoint.GetHasFired());
+                // shotFired.Add(firePoint.GetHasFired());
             }
         }
     }
@@ -55,12 +62,12 @@ public class AmmoController : MonoBehaviour
         
         isReloading = false;
 
-        // Debug.Log("reloadInvoked");
+        Debug.Log("reloadInvoked");
     }
 
     private bool AllShotsFired()
     {
-        for (int i = 0; i < guns.Length; i++)
+        for (int i = 0; i < guns.Count; i++)
         {
             if (guns[i] != null && !guns[i].GetComponent<FirePoint>().GetHasFired())
             {
@@ -69,5 +76,17 @@ public class AmmoController : MonoBehaviour
         }
 
         return true;
+    }
+
+    private void APlayerHasDied()
+    {
+        // use the list of guns, delete guns if players have died
+        for (int i = 0; i < guns.Count; i++)
+        {
+            if (guns[i] != null && !guns[i].transform.parent.gameObject.activeSelf && guns.Count > 1)
+            {
+                guns.Remove(guns[i]);
+            }
+        }
     }
 }
