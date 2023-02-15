@@ -18,6 +18,7 @@ public class AI_Logic : MonoBehaviour
 
     // For player vision
     [SerializeField] private float viewRadius;
+    [SerializeField, Range(1, 360)] private float viewAngles;
     [SerializeField] private LayerMask targetMask, obstacleMask;
 
     // For States
@@ -26,6 +27,7 @@ public class AI_Logic : MonoBehaviour
         wander,
         attack,
         evade,
+        hide,
     }
 
     private State state;
@@ -61,6 +63,10 @@ public class AI_Logic : MonoBehaviour
                 {
                     Evade();   
                 }
+                break;
+            
+            case State.hide:
+                
                 break;
         }
     }
@@ -143,17 +149,31 @@ public class AI_Logic : MonoBehaviour
             float distToTarget = Vector3.Distance(transform.position, target.position);
             
             // Debug.DrawRay(transform.position, dirToTarget * 10, Color.red);
-
-            // Cast a line from the player to the target to see if they're behind a wall or not
-            if (!Physics.Raycast(transform.position, dirToTarget, distToTarget, obstacleMask))
+            
+            // Cast a cone for the player vision, limiting what they can see to things inside of the cone
+            if (Vector3.Angle(transform.forward, dirToTarget) < viewAngles / 2)
             {
-                var rotateDirection = (target.position - transform.position).normalized;
-                var targetRotation = Quaternion.LookRotation(rotateDirection);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360);
+                // Cast a line from the player to the target to see if they're behind a wall or not
+                if (!Physics.Raycast(transform.position, dirToTarget, distToTarget, obstacleMask))
+                {
+                    var rotateDirection = (target.position - transform.position).normalized;
+                    var targetRotation = Quaternion.LookRotation(rotateDirection);
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360);
                 
-                state = State.attack;
+                    state = State.attack;
+                }   
             }
         }
+    }
+    
+    private Vector3 DirFromAngle(float angleInDegress, bool angleIsGlobal)
+    {
+        if (!angleIsGlobal)
+        {
+            angleInDegress += transform.eulerAngles.y;
+        }
+
+        return new Vector3(Mathf.Sin(angleInDegress * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegress * Mathf.Deg2Rad));
     }
 
     // To check the radius of players
@@ -161,7 +181,17 @@ public class AI_Logic : MonoBehaviour
     {
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, viewRadius);
+
+        Gizmos.color = Color.red;
+
+        Vector3 viewAngleA = DirFromAngle(-viewAngles / 2, false);
+        Vector3 viewAngleB = DirFromAngle(viewAngles / 2, false);
+
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius);
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius);
     }
+    
+    
 
     private bool lastManStanding;
 
