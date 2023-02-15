@@ -61,7 +61,7 @@ public class AI_Logic : MonoBehaviour
                 }
                 else
                 {
-                    Evade();   
+                    Evade();
                 }
                 break;
             
@@ -74,6 +74,7 @@ public class AI_Logic : MonoBehaviour
     public void HasReloaded()
     {
         canAttack = true;
+        print(name + " has reloaded");
     }
 
     // Wander State
@@ -102,37 +103,6 @@ public class AI_Logic : MonoBehaviour
         }
 
         return randomLocation;
-    }
-    
-    // Attack State
-    private void Attack()
-    {
-        canAttack = false;
-        firePoint.Shoot();
-        state = State.evade;
-    }
-    
-    // Evade State
-    private void Evade()
-    {
-        GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullet");
-        GameObject bullet = bullets[0];
-
-        for (int i = 0; i < bullets.Length; i++)
-        {
-            // Checks if the current bullet is closer than other bullets
-            if (Vector3.Distance(transform.position, bullet.transform.position) >
-                Vector3.Distance(transform.position, bullets[i].transform.position))
-            {
-                bullet = bullets[i];
-            }
-
-            // Makes a Vector in the opposite direction
-            Vector3 oppositeDir = new Vector3(-1 *bullet.transform.position.x, bullet.transform.position.y,
-                -1 * bullet.transform.position.z);
-
-            agent.SetDestination(oppositeDir);
-        }
     }
     
     // AI line of vision
@@ -193,11 +163,43 @@ public class AI_Logic : MonoBehaviour
     
     
 
+    // Attack State
+    private void Attack()
+    {
+        canAttack = false;
+        firePoint.Shoot();
+        state = State.evade;
+    }
+    
+    // Evade State
+    private void Evade()
+    {
+        // Get a list of all the bullets
+        GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullet");
+        GameObject bullet = bullets[0];
+
+        for (int i = 0; i < bullets.Length; i++)
+        {
+            // Checks if the current bullet is closer than other bullets
+            if (Vector3.Distance(transform.position, bullet.transform.position) >
+                Vector3.Distance(transform.position, bullets[i].transform.position))
+            {
+                bullet = bullets[i];
+            }
+
+            // Makes a Vector in the opposite direction
+            Vector3 oppositeDir = new Vector3(-1 *bullet.transform.position.x, bullet.transform.position.y,
+                -1 * bullet.transform.position.z);
+
+            agent.SetDestination(oppositeDir);
+        }
+    }
+
     private bool lastManStanding;
 
     public void IsLastManStanding()
     {
-        print(name + " is winnar");
+        print(name + " is winner");
         lastManStanding = true;
     }
 

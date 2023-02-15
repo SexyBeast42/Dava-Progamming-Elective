@@ -25,7 +25,7 @@ public class GameController : MonoBehaviour
     {
         for (int i = 0; i < playersInGame.Count; i++)
         {
-            if (playersInGame[i] != null && !playersInGame[i].gameObject.active)
+            if (playersInGame[i] != null && !playersInGame[i].gameObject.active && playersInGame.Count > 1)
             {
                 playersInGame.Remove(playersInGame[i]);
             }
