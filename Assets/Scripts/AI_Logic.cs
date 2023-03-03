@@ -180,6 +180,7 @@ public class AI_Logic : MonoBehaviour
 
         // should determine the bes position to move away without moving the furthest away from it.
         
+        
         for (int i = 0; i < bullets.Length; i++)
         {
             // Checks if the current bullet is closer than other bullets
