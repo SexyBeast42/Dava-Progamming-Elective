@@ -152,6 +152,9 @@ public class AI_Logic : MonoBehaviour
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, viewRadius);
 
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, walkRadius);
+
         Gizmos.color = Color.red;
 
         Vector3 viewAngleA = DirFromAngle(-viewAngles / 2, false);
@@ -177,24 +180,66 @@ public class AI_Logic : MonoBehaviour
         // Get a list of all the bullets
         GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullet");
         GameObject bullet = bullets[0];
-
-        // should determine the bes position to move away without moving the furthest away from it.
         
+        // Get a list of all the players
+        // GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        // Currently it bugs out if all the players die, can maybe fix with using ^ and excluding itself from the list. Still works though.
+        GameObject[] moreThanOnePlayer = GameObject.FindGameObjectsWithTag("Player");
+        Collider[] players = null;
+        
+        if (moreThanOnePlayer.Length > 1)
+        {
+            players = Physics.OverlapSphere(transform.position, walkRadius, targetMask);
+        }
+        
+        Transform player = players[0].transform;
+        
+        // Set the Evasion distance
+        float evasionDistance = 5f;
+
+        // Closest obj to dodge
+        Vector3 closestObj;
+
+        // Determines the closest bullet
         for (int i = 0; i < bullets.Length; i++)
         {
-            // Checks if the current bullet is closer than other bullets
-            if (Vector3.Distance(transform.position, bullet.transform.position) >
+            if (Vector3.Distance(transform.position, bullet.transform.position) > 
                 Vector3.Distance(transform.position, bullets[i].transform.position))
             {
                 bullet = bullets[i];
             }
-
-            // Makes a Vector in the opposite direction
-            Vector3 oppositeDir = new Vector3(-1 *bullet.transform.position.x, bullet.transform.position.y,
-                -1 * bullet.transform.position.z);
-
-            agent.SetDestination(oppositeDir);
         }
+    
+        // Determines the closest player
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (Vector3.Distance(transform.position, player.position) > 
+                Vector3.Distance(transform.position, players[i].transform.position))
+            {
+                player = players[i].transform;
+            }
+        }
+
+        //Checks if the bullet is closer than the player
+        if (Vector3.Distance(transform.position, bullet.transform.position) >
+            Vector3.Distance(transform.position, player.position))
+        {
+            closestObj = player.position;
+        }
+        else
+        {
+            closestObj = bullet.transform.position;
+        }
+
+        // Find current bullets velocity, adjust current velocity to swerve away from
+        // Calculate the direction to evade the bullet
+        Vector3 evadeDirection = transform.position - closestObj;
+        evadeDirection.y = 0;
+        evadeDirection.Normalize();
+    
+        // Move in the opposite direction of the bullet
+        Vector3 evadeDir = transform.position + evadeDirection * evasionDistance;
+        agent.SetDestination(evadeDir);
     }
 
     private bool lastManStanding;
@@ -203,6 +248,8 @@ public class AI_Logic : MonoBehaviour
     {
         print(name + " is winner");
         lastManStanding = true;
+        
+        state = State.wander;
     }
 
     // Kills the AI
