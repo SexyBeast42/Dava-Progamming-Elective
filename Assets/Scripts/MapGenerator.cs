@@ -1,61 +1,119 @@
+using System.Collections;
+using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public class MapGenerator : MonoBehaviour
 {
-    public GameObject floorPrefab;
     public GameObject wallPrefab;
-    public GameObject npcPrefab;
-    public float tileSize = 1.0f;
-    public int mapWidth = 10;
-    public int mapHeight = 10;
-    public int minNpcsPerGroup = 1;
-    public int maxNpcsPerGroup = 5;
-    public int numNpcGroups = 3;
-    
+    public List<GameObject> npcPrefab;
+    public int mapWidth, mapHeight;
+
+    public List<Vector3> playerLocations;
+
     private NavMeshSurface navMeshSurface;
 
     // Start is called before the first frame update
     void Start()
     {
-        // Spawn in floors and walls
-        // Needs to be changed, Currently doesnt work properly
-        // Can start with an already established floor and then all you'd have to do is generate
-        // the walls inside, can play with testing out having outside walls
-        for (int x = 0; x < mapWidth; x++)
-        {
-            for (int y = 0; y < mapHeight; y++)
-            {
-                // Spawn in a floor tile
-                Vector3 floorPosition = new Vector3(x * tileSize, 0, y * tileSize);
-                Instantiate(floorPrefab, floorPosition, Quaternion.identity);
-
-                // Spawn in walls around the edges of the map
-                if (x == 0 || x == mapWidth - 1 || y == 0 || y == mapHeight - 1)
-                {
-                    Vector3 wallPosition = new Vector3(x * tileSize, 0.5f, y * tileSize);
-                    Instantiate(wallPrefab, wallPosition, Quaternion.identity);
-                }
-            }
-        }
+        // Generate map
+        GenerateMap();
+        
+        // Pauses time
+        Time.timeScale = 0f;
 
         // Generate NavMesh
         // Works but navmesh gets screwed if the floor isn't one piece
         navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
         navMeshSurface.BuildNavMesh();
+        
+        // Generate players
+        GeneratePlayers();
+        
+        // Unpause time
+        StartCoroutine(UnpauseTime());
+    }
 
-        // Spawn in NPC groups
-        // Only spawns one group, need a randomiser for total teams (min 2), amount of players each
-        // team can get, can make uneven for fun but (min 1).
-        for (int i = 0; i < numNpcGroups; i++)
+    IEnumerator UnpauseTime()
+    {
+        yield return new WaitForSecondsRealtime(2);
+
+        Time.timeScale = 1f;
+    }
+
+    private void GenerateMap()
+    {
+        // Spawn walls
+        for (int x = 0; x <= mapWidth; x++)
         {
-            int numNpcsInGroup = Random.Range(minNpcsPerGroup, maxNpcsPerGroup + 1);
-
-            for (int j = 0; j < numNpcsInGroup; j++)
+            for (int y = 0; y <= mapHeight; y++)
             {
-                Vector3 npcPosition = new Vector3(Random.Range(tileSize, (mapWidth - 1) * tileSize), 0, Random.Range(tileSize, (mapHeight - 1) * tileSize));
-                Instantiate(npcPrefab, npcPosition, Quaternion.identity);
+                float generateWalls = Random.Range(0f, 9f);
+                
+                // Determines whether or not we should spawn walls
+                if (generateWalls < 2f)
+                {
+                    Vector3 wallPos = new Vector3(x - mapWidth / 2f, 1f, y - mapHeight / 2f);
+                    
+                    //Vector3 wallPos = new Vector3(x * tileSize, .5f, y * tileSize);
+                    Instantiate(wallPrefab, wallPos, quaternion.identity, transform);
+
+                }
+
+                float spawnPlayer = Random.Range(0f, 100f);
+                
+
+                // Determines whether or not we should spawn a player, then save location
+                if (spawnPlayer < 2f)
+                {
+                    Vector3 npcPosition = new Vector3(x - mapWidth / 2f, 1f, y - mapHeight / 2f);
+
+                    playerLocations.Add(npcPosition);
+                }
             }
         }
+    }
+
+    private void GeneratePlayers()
+    {
+        int lastPlayerSpawned = 4;
+        
+        for (int i = 0; i < playerLocations.Count; i++)
+        {
+            int teamNumber = Random.Range(0, 3);
+
+            if (lastPlayerSpawned != teamNumber && !DetectWall(playerLocations[i]))
+            {
+                Instantiate(npcPrefab[teamNumber], playerLocations[i], Quaternion.identity);
+
+                // Make sure we get at least one team versing each other
+                lastPlayerSpawned = teamNumber;
+            }
+        }
+    }
+    
+    private bool DetectWall(Vector3 position)
+    {
+        int layerMask = 6;
+        int maxDist = 1;
+        
+        // Raycast all directions
+        Vector3 playerPosition = position;
+        Vector3[] directions = { Vector3.forward, Vector3.back, Vector3.left, Vector3.right };
+
+        foreach (Vector3 direction in directions)
+        {
+            // Cast ray to direction
+            RaycastHit hit;
+            
+            if (Physics.Raycast(playerPosition, direction, out hit, maxDist, layerMask))
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

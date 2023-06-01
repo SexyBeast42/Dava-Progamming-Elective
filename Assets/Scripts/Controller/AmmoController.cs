@@ -16,6 +16,13 @@ public class AmmoController : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(WaitForSpawn());
+    }
+
+    IEnumerator WaitForSpawn()
+    {
+        yield return new WaitForSeconds(2);
+        
         GetAllGuns();
     }
 

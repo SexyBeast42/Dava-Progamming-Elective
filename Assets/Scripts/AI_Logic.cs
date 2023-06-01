@@ -27,7 +27,7 @@ public class AI_Logic : MonoBehaviour
         wander,
         attack,
         evade,
-        hide,
+        chase,
     }
 
     private State state;
@@ -57,7 +57,7 @@ public class AI_Logic : MonoBehaviour
             case State.evade:
                 if (canAttack)
                 {
-                    state = State.wander;
+                    state = State.chase;
                 }
                 else
                 {
@@ -65,8 +65,8 @@ public class AI_Logic : MonoBehaviour
                 }
                 break;
             
-            case State.hide:
-                
+            case State.chase:
+                Chase();
                 break;
         }
     }
@@ -76,6 +76,8 @@ public class AI_Logic : MonoBehaviour
         canAttack = true;
         print(name + " has reloaded");
     }
+
+    private Vector3 lastKnownEnemyPos;
 
     // Wander State
     private void Wander()
@@ -129,7 +131,9 @@ public class AI_Logic : MonoBehaviour
                     var rotateDirection = (target.position - transform.position).normalized;
                     var targetRotation = Quaternion.LookRotation(rotateDirection);
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 360);
-                
+
+                    // For chase state
+                    lastKnownEnemyPos = target.transform.position;
                     state = State.attack;
                 }   
             }
@@ -179,6 +183,12 @@ public class AI_Logic : MonoBehaviour
     {
         // Get a list of all the bullets
         GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullet");
+
+        if (bullets.Length == 0)
+        {
+            state = State.wander;
+        }
+        
         GameObject bullet = bullets[0];
         
         // Get a list of all the players
@@ -190,8 +200,13 @@ public class AI_Logic : MonoBehaviour
         if (moreThanOnePlayer.Length > 1)
         {
             players = Physics.OverlapSphere(transform.position, walkRadius, targetMask);
+
+            if (players.Length == 0)
+            {
+                state = State.wander;
+            }
         }
-        
+
         Transform player = players[0].transform;
         
         // Set the Evasion distance
@@ -217,6 +232,9 @@ public class AI_Logic : MonoBehaviour
                 Vector3.Distance(transform.position, players[i].transform.position))
             {
                 player = players[i].transform;
+                
+                // for chase state
+                lastKnownEnemyPos = player.transform.position;
             }
         }
 
@@ -240,6 +258,16 @@ public class AI_Logic : MonoBehaviour
         // Move in the opposite direction of the bullet
         Vector3 evadeDir = transform.position + evadeDirection * evasionDistance;
         agent.SetDestination(evadeDir);
+    }
+
+    private void Chase()
+    {
+        agent.SetDestination(lastKnownEnemyPos);
+        
+        if (agent != null && agent.remainingDistance <= agent.stoppingDistance)
+        {
+            state = State.wander;
+        }
     }
 
     private bool lastManStanding;

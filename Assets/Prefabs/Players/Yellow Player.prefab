@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 4531745948368879849}
-  walkRadius: 76
+  walkRadius: 12
   canAttack: 0
   viewRadius: 10
   viewAngles: 60
