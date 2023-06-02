@@ -30,8 +30,7 @@ public class UIController : MonoBehaviour
 
     public void AnnounceReloaded()
     {
-        reloadText.alignment = TextAlignmentOptions.Flush;
-        reloadText.alignment = TextAlignmentOptions.MidlineLeft;
+        reloadText.alignment = TextAlignmentOptions.Center;
         
         StartCoroutine(ReloadCooldown());
     }
