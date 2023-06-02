@@ -73,6 +73,7 @@ public class AI_Logic : MonoBehaviour
             case State.chase:
                 light.enabled = true;
                 Chase();
+                EnemyDetection();
                 break;
         }
     }
