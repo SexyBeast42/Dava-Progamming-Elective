@@ -15,9 +15,13 @@ public class MapGenerator : MonoBehaviour
 
     private NavMeshSurface navMeshSurface;
 
+    private AmmoController ammoController;
+
     // Start is called before the first frame update
     void Start()
     {
+        ammoController = GameObject.Find("AmmoController").GetComponent<AmmoController>();
+        
         // Generate map
         GenerateMap();
         
@@ -31,6 +35,8 @@ public class MapGenerator : MonoBehaviour
         
         // Generate players
         GeneratePlayers();
+
+        ammoController.GetAllGuns();
         
         // Unpause time
         StartCoroutine(UnpauseTime());

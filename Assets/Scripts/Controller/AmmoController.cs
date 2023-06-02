@@ -6,6 +6,8 @@ using UnityEngine.Events;
 
 public class AmmoController : MonoBehaviour
 {
+    public UIController uiController;
+    
     // List for guns and shots fired
     public List<GameObject> guns;
     public List<FirePoint> reloadAll;
@@ -16,14 +18,7 @@ public class AmmoController : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(WaitForSpawn());
-    }
-
-    IEnumerator WaitForSpawn()
-    {
-        yield return new WaitForSeconds(2);
-        
-        GetAllGuns();
+        uiController = GameObject.Find("EventSystem").GetComponent<UIController>();
     }
 
     private void FixedUpdate()
@@ -36,7 +31,7 @@ public class AmmoController : MonoBehaviour
         APlayerHasDied();
     }
     
-    private void GetAllGuns()
+    public void GetAllGuns()
     {
         // Finds all guns in the game
         GameObject[] gunsInGame = GameObject.FindGameObjectsWithTag("Gun");
@@ -69,6 +64,7 @@ public class AmmoController : MonoBehaviour
         
         isReloading = false;
 
+        uiController.AnnounceReloaded();
         Debug.Log("reloadInvoked");
     }
 

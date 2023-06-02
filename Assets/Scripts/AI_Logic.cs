@@ -21,6 +21,9 @@ public class AI_Logic : MonoBehaviour
     [SerializeField, Range(1, 360)] private float viewAngles;
     [SerializeField] private LayerMask targetMask, obstacleMask;
 
+    // To see if the player has a bullet or not
+    [SerializeField] private Light light;
+
     // For States
     private enum State
     {
@@ -36,6 +39,7 @@ public class AI_Logic : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         firePoint = GetComponentInChildren<FirePoint>();
+        light = GetComponent<Light>();
         
         // Tells the player to go to random direction
         agent.SetDestination(GetRandomLocation());
@@ -61,11 +65,13 @@ public class AI_Logic : MonoBehaviour
                 }
                 else
                 {
+                    light.enabled = false;
                     Evade();
                 }
                 break;
             
             case State.chase:
+                light.enabled = true;
                 Chase();
                 break;
         }
@@ -187,6 +193,8 @@ public class AI_Logic : MonoBehaviour
         if (bullets.Length == 0)
         {
             state = State.wander;
+
+            return;
         }
         
         GameObject bullet = bullets[0];
@@ -204,6 +212,8 @@ public class AI_Logic : MonoBehaviour
             if (players.Length == 0)
             {
                 state = State.wander;
+
+                return;
             }
         }
 

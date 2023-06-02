@@ -6,11 +6,15 @@ using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
+    public UIController uiController;
+    
     public List<GameObject> playersInGame;
 
     private void Start()
     {
         StartCoroutine(WaitForSpawn());
+        
+        uiController = GameObject.Find("EventSystem").GetComponent<UIController>();
     }
 
     private void Update()
@@ -74,7 +78,9 @@ public class GameController : MonoBehaviour
         {
             return;
         }
-
+        
+        // here we want to connect with UI to let them know the game has ended
+        uiController.AnnounceWinners(LayerMask.LayerToName(playerTeams.First()));
         Debug.Log(LayerMask.LayerToName(playerTeams.First()) + " has won");
     }
 
