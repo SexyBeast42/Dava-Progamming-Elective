@@ -12,8 +12,6 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(WaitForSpawn());
-        
         uiController = GameObject.Find("EventSystem").GetComponent<UIController>();
     }
 
@@ -30,14 +28,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    IEnumerator WaitForSpawn()
-    {
-        yield return new WaitForSeconds(2);
-        
-        GetAllPlayers();
-    }
-
-    private void GetAllPlayers()
+    public void GetAllPlayers()
     {
         GameObject[] listOfPlayers = GameObject.FindGameObjectsWithTag("Player");
 

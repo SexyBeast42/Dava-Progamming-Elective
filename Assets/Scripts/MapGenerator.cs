@@ -16,11 +16,13 @@ public class MapGenerator : MonoBehaviour
     private NavMeshSurface navMeshSurface;
 
     private AmmoController ammoController;
+    private GameController gameController;
 
     // Start is called before the first frame update
     void Start()
     {
         ammoController = GameObject.Find("AmmoController").GetComponent<AmmoController>();
+        gameController = GameObject.Find("GameController").GetComponent<GameController>();
         
         // Generate map
         GenerateMap();
@@ -37,6 +39,7 @@ public class MapGenerator : MonoBehaviour
         GeneratePlayers();
 
         ammoController.GetAllGuns();
+        gameController.GetAllPlayers();
         
         // Unpause time
         StartCoroutine(UnpauseTime());
@@ -56,23 +59,25 @@ public class MapGenerator : MonoBehaviour
         {
             for (int y = 0; y <= mapHeight; y++)
             {
-                float generateWalls = Random.Range(0f, 9f);
+                bool coordsTaken = false;
+                
+                int generateWalls = Random.Range(0, 9);
                 
                 // Determines whether or not we should spawn walls
-                if (generateWalls < 2f)
+                if (generateWalls < 2)
                 {
                     Vector3 wallPos = new Vector3(x - mapWidth / 2f, 1f, y - mapHeight / 2f);
                     
                     //Vector3 wallPos = new Vector3(x * tileSize, .5f, y * tileSize);
                     Instantiate(wallPrefab, wallPos, quaternion.identity, transform);
 
+                    coordsTaken = true;
                 }
 
-                float spawnPlayer = Random.Range(0f, 100f);
-                
+                int spawnPlayer = Random.Range(0, 100);
 
                 // Determines whether or not we should spawn a player, then save location
-                if (spawnPlayer < 2f)
+                if (!coordsTaken && spawnPlayer < 2)
                 {
                     Vector3 npcPosition = new Vector3(x - mapWidth / 2f, 1f, y - mapHeight / 2f);
 
@@ -88,7 +93,7 @@ public class MapGenerator : MonoBehaviour
         
         for (int i = 0; i < playerLocations.Count; i++)
         {
-            int teamNumber = Random.Range(0, 3);
+            int teamNumber = Random.Range(0, 4);
 
             if (lastPlayerSpawned != teamNumber && !DetectWall(playerLocations[i]))
             {
